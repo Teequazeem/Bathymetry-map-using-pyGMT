@@ -1,0 +1,49 @@
+import pygmt
+
+fig = pygmt.Figure() 
+
+# Specify the coordinate
+xmin = -98    
+xmax = -80
+ymin = 22.5
+ymax = 32
+region = [xmin, xmax, ymin, ymax]  
+
+
+# Set the projection to Mercator centered on the block boundaries
+projection = f"M{(xmin+xmax)/2}/{(ymin+ymax)/2}/10c"
+
+# Set the map frame and fill color
+fig.basemap(region=region, projection=projection, frame=True)
+
+# Plot the bathymetry using the "gebco" dataset
+fig.grdimage("@earth_gebco_15s", region=region, cmap='topo', shading=True)
+
+#cpt
+pygmt.makecpt(cmap='topo', series=[-10000, 0])
+fig.colorbar(frame=[ "x+lElevation", "y+lm"])
+
+# Plot protraction boundaries
+fig.plot(
+    data='/content/protrac.shp',
+    region=region,
+    projection=projection,
+    pen = 'black'
+)
+
+
+# Here, I'm plotting the well location
+fig.plot(
+    x=-91.4616,
+    y=28.3668,
+    style='a0.1i',
+    color='red',
+    pen='black',
+    label='BH_Well',
+)
+
+
+fig.legend(position="JTR+jTR+o0.2c/0.2c", box=True)
+fig.savefig("gulf_of_mexico_bathymetry.png")
+
+fig.show()
